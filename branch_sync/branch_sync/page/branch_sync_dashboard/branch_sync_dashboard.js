@@ -52,6 +52,27 @@ class BranchSyncDashboard {
 				if (r.message) this.render(r.message);
 			},
 		});
+
+		frappe.call({
+			method: "branch_sync.api.get_version_info",
+			callback: (r) => {
+				const d = r.message;
+				if (!d || !d.ok || !d.has_mismatch) return;
+				const rows = d.mismatch.map((m) =>
+					`<td>${m.app}</td><td>${m.local}</td><td>${m.center}</td>`
+				).map(r => `<tr>${r}</tr>`).join("");
+				$("#version_banner").html(`
+					<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:6px;padding:12px 16px;margin-bottom:16px;">
+						⚠️ <strong>Version Mismatch</strong> — Local versions differ from center.
+						<table class="table table-sm table-bordered" style="margin:8px 0 0;background:#fff">
+							<thead><tr><th>App</th><th>Local</th><th>Center</th></tr></thead>
+							<tbody>${rows}</tbody>
+						</table>
+						<small>Update local ERPNext to avoid field compatibility issues during sync.</small>
+					</div>
+				`);
+			},
+		});
 	}
 
 	render(d) {
@@ -60,6 +81,9 @@ class BranchSyncDashboard {
 
 		this.body.html(`
 			<div style="max-width:900px;margin:24px auto;">
+
+				<!-- Version mismatch banner — filled after second API call -->
+				<div id="version_banner"></div>
 
 				<!-- Status Cards -->
 				<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">

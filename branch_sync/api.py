@@ -83,6 +83,60 @@ def get_dashboard_data():
 
 
 @frappe.whitelist()
+def get_version_info():
+    """Compare local vs center app versions. Called from Settings and Dashboard."""
+    import requests as req
+    import frappe.utils
+
+    settings = frappe.get_single("Branch Sync Settings")
+    if not settings.is_setup_complete:
+        return {"ok": False, "message": _("Setup not complete")}
+
+    # Local versions
+    local = {}
+    for app in ["frappe", "erpnext", "hrms"]:
+        try:
+            import importlib
+            m = importlib.import_module(app)
+            local[app] = getattr(m, "__version__", "?")
+        except Exception:
+            local[app] = "?"
+
+    # Center versions
+    center = {}
+    mismatch = []
+    try:
+        from branch_sync.sync.client import _base_url
+        r = req.get(
+            f"{_base_url(settings)}/api/method/frappe.utils.version.get_all_versions",
+            headers=settings.get_auth_headers(),
+            timeout=8,
+        )
+        if r.ok:
+            for item in r.json().get("message", []):
+                key = item.get("title", "").lower()
+                center[key] = item.get("version", "?")
+        else:
+            return {"ok": False, "local": local, "center": {}, "mismatch": []}
+    except Exception as e:
+        return {"ok": False, "local": local, "center": {}, "mismatch": [], "error": str(e)}
+
+    for app in ["frappe", "erpnext", "hrms"]:
+        lv = local.get(app, "?")
+        cv = center.get(app, "?")
+        if lv != "?" and cv != "?" and lv != cv:
+            mismatch.append({"app": app, "local": lv, "center": cv})
+
+    return {
+        "ok": True,
+        "local": local,
+        "center": center,
+        "mismatch": mismatch,
+        "has_mismatch": len(mismatch) > 0,
+    }
+
+
+@frappe.whitelist()
 def retry_failed():
     """Reset all Failed queue items back to Pending."""
     frappe.db.set_value(

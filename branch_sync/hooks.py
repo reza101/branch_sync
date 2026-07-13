@@ -43,3 +43,7 @@ doc_events = {
 fixtures = [
     {"dt": "Module Def", "filters": [["name", "=", "Branch Sync"]]},
 ]
+
+doctype_js = {
+    "Branch Sync Settings": "public/js/branch_sync_settings.js",
+}
