@@ -66,7 +66,7 @@ MASTER_DOCTYPES = [
     },
     {
         "doctype": "Tax Category",
-        "fields": ["name", "title", "is_inter_state", "is_inter_country"],
+        "fields": ["name", "title"],
         "filters": [],
     },
     {

@@ -69,8 +69,9 @@ def _build_payload(doc, settings):
 
 def _submit_on_center(settings, doctype, docname):
     import requests
+    from branch_sync.sync.client import _base_url
     r = requests.post(
-        f"{settings.center_url}/api/resource/{doctype}/{docname}",
+        f"{_base_url(settings)}/api/resource/{doctype}/{docname}",
         json={"data": {"docstatus": 1}},
         headers=settings.get_auth_headers(),
         timeout=30,

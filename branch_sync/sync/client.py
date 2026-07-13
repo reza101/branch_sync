@@ -11,7 +11,7 @@ def is_center_reachable(settings=None):
         settings = get_settings()
     try:
         r = requests.get(
-            f"{settings.center_url}/api/method/frappe.ping",
+            f"{_base_url(settings)}/api/method/frappe.ping",
             timeout=5,
         )
         reachable = r.ok
@@ -24,10 +24,14 @@ def is_center_reachable(settings=None):
     return reachable
 
 
+def _base_url(settings):
+    return settings.center_url.rstrip("/")
+
+
 def center_get(settings, doctype, name):
     """Fetch a single document from center. Returns dict or None."""
     r = requests.get(
-        f"{settings.center_url}/api/resource/{doctype}/{name}",
+        f"{_base_url(settings)}/api/resource/{doctype}/{name}",
         headers=settings.get_auth_headers(),
         timeout=15,
     )
@@ -44,7 +48,7 @@ def center_exists(settings, doctype, name):
 def center_insert(settings, doctype, data):
     """Insert a new document on center."""
     r = requests.post(
-        f"{settings.center_url}/api/resource/{doctype}",
+        f"{_base_url(settings)}/api/resource/{doctype}",
         json={"data": data},
         headers=settings.get_auth_headers(),
         timeout=30,
@@ -64,7 +68,7 @@ def center_list(settings, doctype, filters=None, fields=None, limit_page_length=
         params["fields"] = json.dumps(fields)
 
     r = requests.get(
-        f"{settings.center_url}/api/resource/{doctype}",
+        f"{_base_url(settings)}/api/resource/{doctype}",
         params=params,
         headers=settings.get_auth_headers(),
         timeout=30,
