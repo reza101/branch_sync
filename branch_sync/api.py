@@ -102,22 +102,22 @@ def get_version_info():
         except Exception:
             local[app] = "?"
 
-    # Center versions
+    # Center versions — returns {app: {version, title, ...}}
     center = {}
     mismatch = []
     try:
         from branch_sync.sync.client import _base_url
         r = req.get(
-            f"{_base_url(settings)}/api/method/frappe.utils.version.get_all_versions",
+            f"{_base_url(settings)}/api/method/frappe.utils.change_log.get_versions",
             headers=settings.get_auth_headers(),
             timeout=8,
         )
         if r.ok:
-            for item in r.json().get("message", []):
-                key = item.get("title", "").lower()
-                center[key] = item.get("version", "?")
+            for app_key, info in r.json().get("message", {}).items():
+                center[app_key] = info.get("version", "?")
         else:
-            return {"ok": False, "local": local, "center": {}, "mismatch": []}
+            return {"ok": False, "local": local, "center": {}, "mismatch": [],
+                    "error": f"HTTP {r.status_code}"}
     except Exception as e:
         return {"ok": False, "local": local, "center": {}, "mismatch": [], "error": str(e)}
 
