@@ -53,6 +53,27 @@ MASTER_DOCTYPES = [
         "fields": ["name", "mode_of_payment", "type"],
         "filters": [],
     },
+    {
+        "doctype": "Currency",
+        "fields": ["name", "currency_name", "symbol", "fraction", "fraction_units",
+                   "smallest_currency_fraction_value", "enabled"],
+        "filters": [["enabled", "=", 1]],
+    },
+    {
+        "doctype": "Payment Terms Template",
+        "fields": ["name", "template_name"],
+        "filters": [],
+    },
+    {
+        "doctype": "Tax Category",
+        "fields": ["name", "title", "is_inter_state", "is_inter_country"],
+        "filters": [],
+    },
+    {
+        "doctype": "Terms and Conditions",
+        "fields": ["name", "title", "terms"],
+        "filters": [],
+    },
 ]
 
 # Tree doctypes use nested set (lft/rgt) — saving an existing record with
