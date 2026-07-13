@@ -1,0 +1,128 @@
+{
+ "actions": [],
+ "creation": "2026-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "setup_section",
+  "is_setup_complete",
+  "branch_name",
+  "branch_prefix",
+  "branch_warehouse",
+  "col_break_setup",
+  "center_url",
+  "center_api_key",
+  "center_api_secret",
+  "sync_section",
+  "sync_interval_minutes",
+  "last_push_at",
+  "last_pull_at",
+  "last_connection_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "setup_section",
+   "fieldtype": "Section Break",
+   "label": "Branch Info"
+  },
+  {
+   "fieldname": "is_setup_complete",
+   "fieldtype": "Check",
+   "label": "Setup Complete",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch_name",
+   "fieldtype": "Data",
+   "label": "Branch Name",
+   "reqd": 1,
+   "description": "e.g. Plus Care Pharmacy Mukalla"
+  },
+  {
+   "fieldname": "branch_prefix",
+   "fieldtype": "Data",
+   "label": "Naming Prefix",
+   "reqd": 1,
+   "description": "e.g. MUKALLA — used in all document names"
+  },
+  {
+   "fieldname": "branch_warehouse",
+   "fieldtype": "Link",
+   "label": "Branch Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "col_break_setup",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "center_url",
+   "fieldtype": "Data",
+   "label": "Center URL",
+   "reqd": 1,
+   "description": "e.g. https://erp.pcpmukalla.com"
+  },
+  {
+   "fieldname": "center_api_key",
+   "fieldtype": "Data",
+   "label": "Center API Key",
+   "reqd": 1
+  },
+  {
+   "fieldname": "center_api_secret",
+   "fieldtype": "Password",
+   "label": "Center API Secret",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sync_section",
+   "fieldtype": "Section Break",
+   "label": "Sync Status"
+  },
+  {
+   "fieldname": "sync_interval_minutes",
+   "fieldtype": "Int",
+   "label": "Push Interval (minutes)",
+   "default": "5"
+  },
+  {
+   "fieldname": "last_push_at",
+   "fieldtype": "Datetime",
+   "label": "Last Push At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_pull_at",
+   "fieldtype": "Datetime",
+   "label": "Last Pull At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_connection_status",
+   "fieldtype": "Select",
+   "label": "Last Connection Status",
+   "options": "\nOnline\nOffline",
+   "read_only": 1
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Branch Sync",
+ "name": "Branch Sync Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,2 @@
+include requirements.txt
+recursive-include branch_sync *.json *.js *.css *.html *.py
