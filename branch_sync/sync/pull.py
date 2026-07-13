@@ -105,13 +105,13 @@ def _upsert(doctype, data):
             return  # already correct from restore — don't touch tree structure
         doc = frappe.get_doc(doctype, name)
         for key, val in data.items():
-            if key not in ("name", "doctype", "creation", "owner"):
+            if key not in ("name", "doctype", "creation", "owner") and val is not None:
                 doc.set(key, val)
         doc.save(ignore_permissions=True)
     else:
         doc = frappe.new_doc(doctype)
         for key, val in data.items():
-            if key not in ("doctype", "creation", "owner", "modified", "modified_by"):
+            if key not in ("doctype", "creation", "owner", "modified", "modified_by") and val is not None:
                 doc.set(key, val)
         doc.insert(ignore_permissions=True)
 
