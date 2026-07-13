@@ -77,6 +77,12 @@ def sync_master_data():
     frappe.db.commit()
 
 
+def _get_default_currency():
+    """Return the default currency of the first active company."""
+    currency = frappe.db.get_value("Company", {"is_group": 0}, "default_currency")
+    return currency or "USD"
+
+
 def _pull_doctype(config, settings):
     doctype = config["doctype"]
     try:
@@ -88,6 +94,9 @@ def _pull_doctype(config, settings):
             limit_page_length=1000,
         )
         for record in records:
+            # Supplier requires default_currency — fall back to company default
+            if doctype == "Supplier" and not record.get("default_currency"):
+                record["default_currency"] = _get_default_currency()
             _upsert(doctype, record)
         write_log("Pull", doctype, f"{len(records)} records", "Success")
     except Exception as e:
