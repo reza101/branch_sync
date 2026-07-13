@@ -40,7 +40,7 @@ MASTER_DOCTYPES = [
     {
         "doctype": "Supplier",
         "fields": ["name", "supplier_name", "supplier_group", "supplier_type",
-                   "country", "mobile_no", "email_id"],
+                   "country", "mobile_no", "email_id", "default_currency"],
         "filters": [],
     },
     {
@@ -54,6 +54,12 @@ MASTER_DOCTYPES = [
         "filters": [],
     },
 ]
+
+# Tree doctypes use nested set (lft/rgt) — saving an existing record with
+# parent fields triggers "cannot be added to its own descendants". Since the
+# local DB was restored from center, these records are already correct;
+# only insert new ones, never update existing tree nodes.
+TREE_DOCTYPES = {"Item Group", "Customer Group", "Territory", "Warehouse"}
 
 
 def sync_master_data():
@@ -95,6 +101,8 @@ def _upsert(doctype, data):
         return
 
     if frappe.db.exists(doctype, name):
+        if doctype in TREE_DOCTYPES:
+            return  # already correct from restore — don't touch tree structure
         doc = frappe.get_doc(doctype, name)
         for key, val in data.items():
             if key not in ("name", "doctype", "creation", "owner"):
