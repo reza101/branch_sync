@@ -48,9 +48,38 @@ def ensure_dependencies(doctype, docname, settings):
 
     for dep_doctype, field_paths in dep_map.items():
         names = _extract_names(doc, field_paths, doctype, dep_doctype)
+
+        # batch_no may be stored in Serial and Batch Bundle entries, not in items directly
+        if dep_doctype == "Batch":
+            names |= _extract_batch_names_from_bundles(doc)
+
         for name in names:
             if name and not center_exists(settings, dep_doctype, name):
                 _push_dependency(dep_doctype, name, settings)
+
+
+def _extract_batch_names_from_bundles(doc):
+    """Extract batch_no values from Serial and Batch Bundle entries for items
+    where batch_no is empty but serial_and_batch_bundle is set."""
+    batch_names = set()
+    for row in (doc.get("items") or []):
+        if row.get("batch_no"):
+            continue
+        bundle_name = row.get("serial_and_batch_bundle")
+        if not bundle_name:
+            continue
+        try:
+            entries = frappe.get_all(
+                "Serial and Batch Entry",
+                filters={"parent": bundle_name},
+                fields=["batch_no"],
+            )
+            for entry in entries:
+                if entry.batch_no:
+                    batch_names.add(entry.batch_no)
+        except Exception:
+            pass
+    return batch_names
 
 
 def _extract_names(doc, field_paths, parent_doctype, dep_doctype):
@@ -77,12 +106,16 @@ def _extract_names(doc, field_paths, parent_doctype, dep_doctype):
 
 
 def _push_dependency(dep_doctype, name, settings):
+    import json
     dep_doc = frappe.get_doc(dep_doctype, name)
     fields = DEPENDENCY_PUSH_FIELDS.get(dep_doctype, [])
 
-    data = {"doctype": dep_doctype, "name": name}
+    raw = {"name": name}
     for f in fields:
-        data[f] = dep_doc.get(f)
+        raw[f] = dep_doc.get(f)
+
+    # Serialize date/datetime/Decimal objects
+    data = json.loads(frappe.as_json(raw))
 
     try:
         center_insert(settings, dep_doctype, data)
