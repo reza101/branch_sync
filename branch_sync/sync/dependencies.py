@@ -24,12 +24,10 @@ DEPENDENCY_FIELDS = {
     "POS Invoice": {
         "Customer": ["customer"],
         "Batch": ["items.batch_no"],
-        "POS Opening Entry": ["pos_opening_entry"],
     },
     "POS Opening Entry": {
         "POS Profile": ["pos_profile"],
     },
-    # POS Closing Entry depends on Opening Entry which is already pushed
 }
 
 # Fields to push for each dependency doctype
@@ -65,6 +63,31 @@ def ensure_dependencies(doctype, docname, settings):
         for name in names:
             if name and not center_exists(settings, dep_doctype, name):
                 _push_dependency(dep_doctype, name, settings)
+
+    # POS Invoice: find open POS Opening Entry via pos_profile and push it
+    if doctype == "POS Invoice":
+        _ensure_pos_opening_entry(doc, settings)
+
+
+def _ensure_pos_opening_entry(pos_invoice_doc, settings):
+    """Find the active POS Opening Entry for this invoice's POS Profile and push it."""
+    pos_profile = pos_invoice_doc.get("pos_profile")
+    if not pos_profile:
+        return
+
+    # Push POS Profile first
+    if not center_exists(settings, "POS Profile", pos_profile):
+        _push_dependency("POS Profile", pos_profile, settings)
+
+    # Find submitted open entry for this profile
+    opening_entry = frappe.db.get_value(
+        "POS Opening Entry",
+        {"pos_profile": pos_profile, "docstatus": 1},
+        "name",
+        order_by="creation desc",
+    )
+    if opening_entry and not center_exists(settings, "POS Opening Entry", opening_entry):
+        _push_dependency("POS Opening Entry", opening_entry, settings)
 
 
 def _extract_batch_names_from_bundles(doc):
@@ -116,6 +139,7 @@ def _extract_names(doc, field_paths, parent_doctype, dep_doctype):
 
 # Doctypes pushed as full documents (all fields + child tables)
 FULL_DOC_PUSH = {"POS Profile", "POS Opening Entry"}
+# POS Profile is not submittable — only POS Opening Entry needs submit after push
 
 # Child table system fields to strip
 _DEP_CHILD_STRIP = {
