@@ -17,6 +17,9 @@ SUBMITTABLE_DOCTYPES = {
     "Sales Invoice", "Purchase Invoice", "Payment Entry",
     "Stock Entry", "Stock Reconciliation",
     "POS Invoice", "POS Opening Entry", "POS Closing Entry",
+    "Attendance", "Leave Application", "Salary Slip",
+    "Expense Claim", "Payroll Entry",
+    # Employee is NOT submittable — insert only, no submit
 }
 
 
@@ -32,6 +35,22 @@ def push_document(doctype, docname, settings=None):
         existing = center_get(settings, doctype, docname)
 
         if existing:
+            if doctype not in SUBMITTABLE_DOCTYPES:
+                # Non-submittable (e.g. Employee) — update existing record
+                doc = frappe.get_doc(doctype, docname)
+                payload = _build_payload(doc, settings)
+                import requests
+                from branch_sync.sync.client import _base_url
+                r = requests.put(
+                    f"{_base_url(settings)}/api/resource/{doctype}/{docname}",
+                    json=payload,
+                    headers=settings.get_auth_headers(),
+                    timeout=30,
+                )
+                if not r.ok:
+                    raise Exception(f"Update failed HTTP {r.status_code}: {r.text[:500]}")
+                write_log("Push", doctype, docname, "Success", duration=time.time() - start)
+                return
             if existing.get("docstatus") == 1:
                 # Already submitted on center — nothing to do
                 write_log("Push", doctype, docname, "Skipped", duration=time.time() - start)

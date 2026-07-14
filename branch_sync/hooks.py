@@ -52,6 +52,27 @@ doc_events = {
     "POS Closing Entry": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
     },
+    # HRMS — submittable
+    "Attendance": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+    },
+    "Leave Application": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+    },
+    "Salary Slip": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+    },
+    "Expense Claim": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+    },
+    "Payroll Entry": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+    },
+    # HRMS — Employee (not submittable, push on create/update)
+    "Employee": {
+        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
+        "on_update": "branch_sync.sync.queue.enqueue_on_save",
+    },
 }
 
 fixtures = [

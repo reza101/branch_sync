@@ -4,24 +4,44 @@ from branch_sync.sync.client import get_settings, is_center_reachable
 MAX_RETRIES = 5
 
 
-def enqueue_on_submit(doc, method):
-    """Hook called when a tracked doctype is submitted."""
-    settings = get_settings()
-    if not settings.is_setup_complete:
-        return
-
-    posting_date = getattr(doc, "posting_date", None)
-    posting_time = getattr(doc, "posting_time", None)
-
+def _enqueue(doctype, name, posting_date=None, posting_time=None):
+    """Add a document to the sync queue."""
     queue_doc = frappe.new_doc("Branch Sync Queue")
-    queue_doc.doctype_name = doc.doctype
-    queue_doc.document_name = doc.name
+    queue_doc.doctype_name = doctype
+    queue_doc.document_name = name
     queue_doc.posting_date = posting_date
     queue_doc.posting_time = str(posting_time) if posting_time else None
     queue_doc.status = "Pending"
     queue_doc.queued_at = frappe.utils.now()
     queue_doc.insert(ignore_permissions=True)
     frappe.db.commit()
+
+
+def enqueue_on_submit(doc, method):
+    """Hook called when a tracked doctype is submitted."""
+    settings = get_settings()
+    if not settings.is_setup_complete:
+        return
+    _enqueue(
+        doc.doctype, doc.name,
+        getattr(doc, "posting_date", None),
+        getattr(doc, "posting_time", None),
+    )
+
+
+def enqueue_on_save(doc, method):
+    """Hook for non-submittable doctypes (e.g. Employee) — enqueue on insert/update."""
+    settings = get_settings()
+    if not settings.is_setup_complete:
+        return
+    # Avoid duplicate queue entries for the same document
+    if frappe.db.exists("Branch Sync Queue", {
+        "doctype_name": doc.doctype,
+        "document_name": doc.name,
+        "status": "Pending",
+    }):
+        return
+    _enqueue(doc.doctype, doc.name)
 
 
 def process_queue():
