@@ -55,23 +55,64 @@ doc_events = {
     # HRMS — submittable
     "Attendance": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "Leave Application": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
+    },
+    "Leave Allocation": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
+    },
+    "Leave Encashment": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "Salary Slip": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
+    },
+    "Additional Salary": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "Expense Claim": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
+    },
+    "Employee Advance": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "Payroll Entry": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
-    # HRMS — Employee (not submittable, push on create/update)
+    "Gratuity": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
+    },
+    # HRMS — non-submittable
     "Employee": {
         "after_insert": "branch_sync.sync.queue.enqueue_on_save",
-        "on_update": "branch_sync.sync.queue.enqueue_on_save",
+        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
+        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
+    },
+    "Employee Checkin": {
+        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
+        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
+        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
     },
 }
 

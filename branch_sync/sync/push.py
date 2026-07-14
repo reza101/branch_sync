@@ -17,9 +17,10 @@ SUBMITTABLE_DOCTYPES = {
     "Sales Invoice", "Purchase Invoice", "Payment Entry",
     "Stock Entry", "Stock Reconciliation",
     "POS Invoice", "POS Opening Entry", "POS Closing Entry",
-    "Attendance", "Leave Application", "Salary Slip",
-    "Expense Claim", "Payroll Entry",
-    # Employee is NOT submittable — insert only, no submit
+    "Attendance", "Leave Application", "Leave Allocation", "Leave Encashment",
+    "Salary Slip", "Additional Salary", "Expense Claim",
+    "Employee Advance", "Payroll Entry", "Gratuity",
+    # Employee / Employee Checkin are NOT submittable — insert/update only
 }
 
 
