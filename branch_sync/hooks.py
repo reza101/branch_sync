@@ -27,30 +27,44 @@ scheduler_events = {
 # Queue submitted docs for push automatically
 doc_events = {
     "Sales Invoice": {
-        "validate": "branch_sync.sync.naming.validate_branch_prefix",
+        "validate":  "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "Purchase Invoice": {
-        "validate": "branch_sync.sync.naming.validate_branch_prefix",
+        "validate":  "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "Payment Entry": {
-        "validate": "branch_sync.sync.naming.validate_branch_prefix",
+        "validate":  "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "Stock Entry": {
-        "validate": "branch_sync.sync.naming.validate_branch_prefix",
+        "validate":  "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "POS Invoice": {
-        "validate": "branch_sync.sync.naming.validate_branch_prefix",
+        "validate":  "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "POS Opening Entry": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     "POS Closing Entry": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     # HRMS — submittable
     "Attendance": {
