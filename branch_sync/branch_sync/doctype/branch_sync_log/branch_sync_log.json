@@ -20,7 +20,7 @@
    "fieldname": "sync_type",
    "fieldtype": "Select",
    "label": "Type",
-   "options": "Push\nPull",
+   "options": "Push\nPull\nCancel\nDelete",
    "in_list_view": 1
   },
   {

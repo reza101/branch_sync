@@ -92,16 +92,24 @@ def process_queue():
 
 
 def _process_queue_item(item, settings):
+    import time
     from branch_sync.sync.push import push_document
     from branch_sync.sync.lifecycle import cancel_on_center, delete_on_center
+    from branch_sync.sync.client import write_log
+    start = time.time()
     try:
         action = item.get("action") or "Push"
         if action == "Push":
+            # push_document writes its own log
             push_document(item.doctype_name, item.document_name, settings)
         elif action == "Cancel":
             cancel_on_center(item.doctype_name, item.document_name, settings)
+            write_log("Cancel", item.doctype_name, item.document_name, "Success",
+                      duration=time.time() - start)
         elif action == "Delete":
             delete_on_center(item.doctype_name, item.document_name, settings)
+            write_log("Delete", item.doctype_name, item.document_name, "Success",
+                      duration=time.time() - start)
 
         frappe.db.set_value("Branch Sync Queue", item.name, {
             "status": "Synced",
@@ -115,4 +123,8 @@ def _process_queue_item(item, settings):
             "retry_count": retry_count,
             "error_message": str(e)[:2000],
         })
+        action = item.get("action") or "Push"
+        if action in ("Cancel", "Delete"):
+            write_log(action, item.doctype_name, item.document_name, "Failed",
+                      error_message=str(e), duration=time.time() - start)
     frappe.db.commit()
