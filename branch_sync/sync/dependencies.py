@@ -24,8 +24,12 @@ DEPENDENCY_FIELDS = {
     "POS Invoice": {
         "Customer": ["customer"],
         "Batch": ["items.batch_no"],
+        "POS Opening Entry": ["pos_opening_entry"],
     },
-    # POS Opening/Closing Entry have no linked deps that need pre-push
+    "POS Opening Entry": {
+        "POS Profile": ["pos_profile"],
+    },
+    # POS Closing Entry depends on Opening Entry which is already pushed
 }
 
 # Fields to push for each dependency doctype
@@ -110,20 +114,59 @@ def _extract_names(doc, field_paths, parent_doctype, dep_doctype):
     return names
 
 
+# Doctypes pushed as full documents (all fields + child tables)
+FULL_DOC_PUSH = {"POS Profile", "POS Opening Entry"}
+
+# Child table system fields to strip
+_DEP_CHILD_STRIP = {
+    "name", "owner", "creation", "modified", "modified_by",
+    "parent", "parenttype", "parentfield", "doctype",
+}
+
+_DEP_STRIP = {
+    "owner", "creation", "modified", "modified_by", "doctype",
+    "amended_from", "_user_tags", "__islocal", "__unsaved",
+}
+
+
 def _push_dependency(dep_doctype, name, settings):
     import json
     dep_doc = frappe.get_doc(dep_doctype, name)
-    fields = DEPENDENCY_PUSH_FIELDS.get(dep_doctype, [])
 
-    raw = {"name": name}
-    for f in fields:
-        raw[f] = dep_doc.get(f)
+    if dep_doctype in FULL_DOC_PUSH:
+        # Resolve nested dependencies first (e.g. POS Profile before POS Opening Entry)
+        nested = DEPENDENCY_FIELDS.get(dep_doctype, {})
+        for nested_doctype, nested_paths in nested.items():
+            nested_names = _extract_names(dep_doc, nested_paths, dep_doctype, nested_doctype)
+            for nested_name in nested_names:
+                if nested_name and not center_exists(settings, nested_doctype, nested_name):
+                    _push_dependency(nested_doctype, nested_name, settings)
 
-    # Serialize date/datetime/Decimal objects
-    data = json.loads(frappe.as_json(raw))
+        was_submitted = dep_doc.docstatus == 1
+        raw = {k: v for k, v in dep_doc.as_dict().items() if k not in _DEP_STRIP}
+        # Insert as draft (Frappe always creates as draft via REST)
+        raw["docstatus"] = 0
+        data = json.loads(frappe.as_json(raw))
+        for key, val in data.items():
+            if isinstance(val, list):
+                data[key] = [
+                    {ck: cv for ck, cv in row.items() if ck not in _DEP_CHILD_STRIP}
+                    for row in val if isinstance(row, dict)
+                ]
+    else:
+        was_submitted = False
+        fields = DEPENDENCY_PUSH_FIELDS.get(dep_doctype, [])
+        raw = {"name": name}
+        for f in fields:
+            raw[f] = dep_doc.get(f)
+        data = json.loads(frappe.as_json(raw))
 
     try:
         center_insert(settings, dep_doctype, data)
+        # Submit on center if the original doc was submitted (e.g. POS Opening Entry)
+        if was_submitted:
+            from branch_sync.sync.push import _submit_on_center
+            _submit_on_center(settings, dep_doctype, name)
     except Exception as e:
         frappe.log_error(
             title=f"Branch Sync: dependency push failed ({dep_doctype} {name})",
