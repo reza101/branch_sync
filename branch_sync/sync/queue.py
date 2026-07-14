@@ -4,9 +4,10 @@ from branch_sync.sync.client import get_settings, is_center_reachable
 MAX_RETRIES = 5
 
 
-def _enqueue(doctype, name, posting_date=None, posting_time=None):
+def _enqueue(doctype, name, action="Push", posting_date=None, posting_time=None):
     """Add a document to the sync queue."""
     queue_doc = frappe.new_doc("Branch Sync Queue")
+    queue_doc.action = action
     queue_doc.doctype_name = doctype
     queue_doc.document_name = name
     queue_doc.posting_date = posting_date
@@ -34,14 +35,31 @@ def enqueue_on_save(doc, method):
     settings = get_settings()
     if not settings.is_setup_complete:
         return
-    # Avoid duplicate queue entries for the same document
+    # Avoid duplicate pending Push entries for the same document
     if frappe.db.exists("Branch Sync Queue", {
+        "action": "Push",
         "doctype_name": doc.doctype,
         "document_name": doc.name,
         "status": "Pending",
     }):
         return
-    _enqueue(doc.doctype, doc.name)
+    _enqueue(doc.doctype, doc.name, action="Push")
+
+
+def enqueue_on_cancel(doc, method):
+    """Hook called on cancel — queue a Cancel action."""
+    settings = get_settings()
+    if not settings.is_setup_complete:
+        return
+    _enqueue(doc.doctype, doc.name, action="Cancel")
+
+
+def enqueue_on_trash(doc, method):
+    """Hook called on delete — queue a Delete action (doc still exists at this point)."""
+    settings = get_settings()
+    if not settings.is_setup_complete:
+        return
+    _enqueue(doc.doctype, doc.name, action="Delete")
 
 
 def process_queue():
@@ -75,8 +93,16 @@ def process_queue():
 
 def _process_queue_item(item, settings):
     from branch_sync.sync.push import push_document
+    from branch_sync.sync.lifecycle import cancel_on_center, delete_on_center
     try:
-        push_document(item.doctype_name, item.document_name, settings)
+        action = item.get("action") or "Push"
+        if action == "Push":
+            push_document(item.doctype_name, item.document_name, settings)
+        elif action == "Cancel":
+            cancel_on_center(item.doctype_name, item.document_name, settings)
+        elif action == "Delete":
+            delete_on_center(item.doctype_name, item.document_name, settings)
+
         frappe.db.set_value("Branch Sync Queue", item.name, {
             "status": "Synced",
             "synced_at": frappe.utils.now(),

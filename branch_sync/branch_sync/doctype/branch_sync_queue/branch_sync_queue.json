@@ -5,6 +5,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "action",
   "doctype_name",
   "document_name",
   "posting_date",
@@ -18,6 +19,15 @@
   "error_message"
  ],
  "fields": [
+  {
+   "fieldname": "action",
+   "fieldtype": "Select",
+   "label": "Action",
+   "options": "Push\nCancel\nDelete",
+   "default": "Push",
+   "reqd": 1,
+   "in_list_view": 1
+  },
   {
    "fieldname": "doctype_name",
    "fieldtype": "Data",
