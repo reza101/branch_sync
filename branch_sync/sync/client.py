@@ -49,11 +49,12 @@ def center_insert(settings, doctype, data):
     """Insert a new document on center."""
     r = requests.post(
         f"{_base_url(settings)}/api/resource/{doctype}",
-        json={"data": data},
+        json=data,
         headers=settings.get_auth_headers(),
         timeout=30,
     )
-    r.raise_for_status()
+    if not r.ok:
+        raise Exception(f"HTTP {r.status_code}: {r.text[:500]}")
     return r.json().get("data")
 
 

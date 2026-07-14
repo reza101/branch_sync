@@ -27,15 +27,19 @@ scheduler_events = {
 # Queue submitted docs for push automatically
 doc_events = {
     "Sales Invoice": {
+        "validate": "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
     },
     "Purchase Invoice": {
+        "validate": "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
     },
     "Payment Entry": {
+        "validate": "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
     },
     "Stock Entry": {
+        "validate": "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
     },
 }

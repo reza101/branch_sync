@@ -92,3 +92,48 @@ def _push_dependency(dep_doctype, name, settings):
             message=str(e),
         )
         raise
+
+
+_BUNDLE_STRIP = {"owner", "creation", "modified", "modified_by", "doctype"}
+_BUNDLE_ENTRY_STRIP = {
+    "name", "owner", "creation", "modified", "modified_by",
+    "parent", "parenttype", "parentfield", "doctype",
+}
+
+
+def _push_serial_batch_bundle(name, settings):
+    """Push Serial and Batch Bundle to center preserving its UUID name.
+
+    Bundle is pushed as draft with voucher_no cleared to break the circular
+    reference (invoice doesn't exist on center yet). When the invoice is
+    submitted on center, ERPNext links the bundle and submits it automatically.
+    """
+    import json
+
+    doc = frappe.get_doc("Serial and Batch Bundle", name)
+    data = {}
+    for k, v in doc.as_dict().items():
+        if k in _BUNDLE_STRIP:
+            continue
+        if isinstance(v, list):
+            data[k] = [
+                {ek: ev for ek, ev in row.items() if ek not in _BUNDLE_ENTRY_STRIP}
+                for row in v if isinstance(row, dict)
+            ]
+        else:
+            data[k] = v
+
+    # Clear voucher link — center doesn't have the invoice yet (circular dep)
+    data["voucher_no"] = ""
+    data["docstatus"] = 0  # keep draft; invoice submission will submit it
+
+    data = json.loads(frappe.as_json(data))
+
+    try:
+        center_insert(settings, "Serial and Batch Bundle", data)
+    except Exception as e:
+        frappe.log_error(
+            title=f"Branch Sync: Serial and Batch Bundle push failed ({name})",
+            message=str(e),
+        )
+        raise

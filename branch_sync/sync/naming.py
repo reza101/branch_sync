@@ -47,3 +47,20 @@ def _set_series(doctype, series):
         "default", series)
 
     frappe.clear_cache(doctype=doctype)
+
+
+def validate_branch_prefix(doc, method):
+    """Block save if the naming series doesn't start with the branch prefix."""
+    settings = frappe.get_cached_doc("Branch Sync Settings")
+    if not settings.is_setup_complete:
+        return
+    prefix = settings.branch_prefix
+    if not prefix:
+        return
+    naming_series = doc.get("naming_series") or ""
+    if naming_series and not naming_series.startswith(prefix):
+        frappe.throw(
+            f"This branch only allows naming series with prefix <b>{prefix}</b>.<br>"
+            f"Please select a series starting with <b>{prefix}-</b>.",
+            title="Invalid Naming Series"
+        )
