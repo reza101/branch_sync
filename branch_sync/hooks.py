@@ -42,6 +42,16 @@ doc_events = {
         "validate": "branch_sync.sync.naming.validate_branch_prefix",
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
     },
+    "POS Invoice": {
+        "validate": "branch_sync.sync.naming.validate_branch_prefix",
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+    },
+    "POS Opening Entry": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+    },
+    "POS Closing Entry": {
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+    },
 }
 
 fixtures = [

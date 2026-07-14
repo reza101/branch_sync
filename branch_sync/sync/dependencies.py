@@ -21,6 +21,11 @@ DEPENDENCY_FIELDS = {
     "Stock Reconciliation": {
         "Batch": ["items.batch_no"],
     },
+    "POS Invoice": {
+        "Customer": ["customer"],
+        "Batch": ["items.batch_no"],
+    },
+    # POS Opening/Closing Entry have no linked deps that need pre-push
 }
 
 # Fields to push for each dependency doctype

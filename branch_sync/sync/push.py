@@ -16,6 +16,7 @@ STRIP_FIELDS = {
 SUBMITTABLE_DOCTYPES = {
     "Sales Invoice", "Purchase Invoice", "Payment Entry",
     "Stock Entry", "Stock Reconciliation",
+    "POS Invoice", "POS Opening Entry", "POS Closing Entry",
 }
 
 

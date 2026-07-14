@@ -8,6 +8,7 @@ NAMING_SERIES_DOCTYPES = [
     "Batch",
     "Customer",
     "Supplier",
+    "POS Invoice",
 ]
 
 
