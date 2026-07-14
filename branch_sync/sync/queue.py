@@ -75,7 +75,7 @@ def process_queue():
     pending = frappe.get_all(
         "Branch Sync Queue",
         filters={"status": "Pending"},
-        fields=["name", "doctype_name", "document_name", "retry_count",
+        fields=["name", "action", "doctype_name", "document_name", "retry_count",
                 "posting_date", "posting_time"],
         order_by="posting_date asc, posting_time asc, queued_at asc",
         limit=50,
