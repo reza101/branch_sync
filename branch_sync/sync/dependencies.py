@@ -64,8 +64,8 @@ def ensure_dependencies(doctype, docname, settings):
             if name and not center_exists(settings, dep_doctype, name):
                 _push_dependency(dep_doctype, name, settings)
 
-    # POS Invoice: find open POS Opening Entry via pos_profile and push it
-    if doctype == "POS Invoice":
+    # POS Invoice/Closing Entry: find open POS Opening Entry via pos_profile and push it
+    if doctype in ("POS Invoice", "POS Closing Entry"):
         _ensure_pos_opening_entry(doc, settings)
 
 
