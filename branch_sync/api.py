@@ -40,14 +40,19 @@ def run_initial_pull():
 @frappe.whitelist()
 def get_settings():
     """Return saved wizard settings so the UI can pre-fill on re-open."""
+    from frappe.utils.password import get_decrypted_password
     s = frappe.get_single("Branch Sync Settings")
+    try:
+        secret = get_decrypted_password("Branch Sync Settings", "Branch Sync Settings", "center_api_secret") or ""
+    except Exception:
+        secret = ""
     return {
         "branch_name": s.branch_name or "",
         "branch_prefix": s.branch_prefix or "",
         "branch_warehouse": s.branch_warehouse or "",
         "center_url": s.center_url or "",
         "center_api_key": s.center_api_key or "",
-        "center_api_secret": s.center_api_secret or "",
+        "center_api_secret": secret,
         "is_setup_complete": cint(s.is_setup_complete),
     }
 
