@@ -201,6 +201,11 @@ doc_events = {
         "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     # Plus Care Pharmacy — non-submittable
+    "Delivery Zone": {
+        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
+        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
+        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
+    },
     "Courier": {
         "after_insert": "branch_sync.sync.queue.enqueue_on_save",
         "on_update":    "branch_sync.sync.queue.enqueue_on_save",

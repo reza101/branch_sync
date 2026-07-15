@@ -37,6 +37,10 @@ DEPENDENCY_FIELDS = {
         "POS Profile": ["pos_profile"],
     },
     "Journal Entry": {},
+    "Delivery Order": {
+        "Delivery Zone": ["delivery_zone"],
+        "Customer": ["customer"],
+    },
 }
 
 # Fields to push for each dependency doctype
@@ -53,6 +57,13 @@ DEPENDENCY_PUSH_FIELDS = {
         "batch_id", "item", "expiry_date", "manufacturing_date",
         "supplier", "description",
         # batch_qty intentionally excluded — recalculated from SLE
+    ],
+    "Delivery Zone": [
+        "zone_name", "zone_code", "is_active", "priority",
+        "center_latitude", "center_longitude", "radius_km",
+        "base_delivery_fee", "per_km_charge", "free_delivery_threshold",
+        "min_order_value", "service_start_time", "service_end_time",
+        "service_days", "average_eta_minutes",
     ],
 }
 
