@@ -166,3 +166,34 @@ def retry_failed():
     )
     frappe.db.commit()
     return {"ok": True}
+
+
+@frappe.whitelist()
+def insert_with_name(doctype, doc):
+    """
+    Insert a document forcing the name supplied by the branch, bypassing
+    Frappe's auto-naming counter and the allow_rename=0 restriction on
+    financial doctypes (Sales Invoice, Payment Entry, etc.).
+
+    Called by branch_sync push.py on the CENTER site when the standard
+    REST insert would auto-generate a different name.
+    """
+    import json
+    if isinstance(doc, str):
+        doc = json.loads(doc)
+
+    desired_name = doc.get("name")
+
+    doc_obj = frappe.get_doc({"doctype": doctype, **doc})
+    doc_obj.insert(ignore_permissions=True)
+    auto_name = doc_obj.name
+
+    if desired_name and auto_name != desired_name:
+        # force=True bypasses allow_rename=0 on financial doctypes
+        frappe.rename_doc(
+            doctype, auto_name, desired_name,
+            force=True, ignore_permissions=True,
+        )
+
+    frappe.db.commit()
+    return {"name": desired_name or auto_name}

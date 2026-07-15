@@ -55,16 +55,34 @@ def center_exists(settings, doctype, name):
 
 
 def center_insert(settings, doctype, data):
-    """Insert a new document on center."""
+    """Insert a new document on center, preserving the branch document name.
+
+    Calls the custom branch_sync.api.insert_with_name endpoint (requires
+    branch_sync to be installed on center). Falls back to the standard REST
+    insert if the endpoint is unavailable (e.g. branch_sync not installed).
+    """
+    import json as _json
+    custom_url = f"{_base_url(settings)}/api/method/branch_sync.api.insert_with_name"
     r = requests.post(
-        _resource_url(settings, doctype),
-        json=data,
+        custom_url,
+        json={"doctype": doctype, "doc": _json.dumps(data)},
         headers=settings.get_auth_headers(),
         timeout=30,
     )
+    if r.status_code == 404:
+        # branch_sync not installed on center — fall back to standard REST
+        r2 = requests.post(
+            _resource_url(settings, doctype),
+            json=data,
+            headers=settings.get_auth_headers(),
+            timeout=30,
+        )
+        if not r2.ok:
+            raise Exception(f"HTTP {r2.status_code}: {r2.text[:500]}")
+        return r2.json().get("data")
     if not r.ok:
         raise Exception(f"HTTP {r.status_code}: {r.text[:500]}")
-    return r.json().get("data")
+    return r.json().get("message")
 
 
 def center_list(settings, doctype, filters=None, fields=None, limit_page_length=500):

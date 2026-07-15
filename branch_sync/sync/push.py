@@ -66,7 +66,7 @@ def push_document(doctype, docname, settings=None):
             doc = frappe.get_doc(doctype, docname)
             payload = _build_payload(doc, settings)
             result = center_insert(settings, doctype, payload)
-            # Center may auto-generate a different name — use the returned name for submit
+            # Center may auto-generate a different name — use it for submit
             if result and isinstance(result, dict) and result.get("name"):
                 docname = result["name"]
 
