@@ -142,6 +142,16 @@ doc_events = {
         "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
     # Non-submittable master data
+    "Warehouse": {
+        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
+        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
+        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
+    },
+    "Bank Account": {
+        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
+        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
+        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
+    },
     "Customer": {
         "after_insert": "branch_sync.sync.queue.enqueue_on_save",
         "on_update":    "branch_sync.sync.queue.enqueue_on_save",

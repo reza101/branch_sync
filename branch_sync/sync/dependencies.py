@@ -73,9 +73,71 @@ def ensure_dependencies(doctype, docname, settings):
             if name and not center_exists(settings, dep_doctype, name):
                 _push_dependency(dep_doctype, name, settings)
 
+    # Ensure all warehouses referenced in this doc exist on center
+    if doctype in ("Stock Entry", "Stock Reconciliation", "Purchase Receipt",
+                   "Delivery Note", "POS Invoice"):
+        _ensure_warehouses_for_doc(doc, settings)
+
+    # Payment Entry: ensure bank account exists on center
+    if doctype == "Payment Entry":
+        _ensure_bank_account(doc.get("bank_account"), settings)
+
     # POS Invoice/Closing Entry: find open POS Opening Entry via pos_profile and push it
     if doctype in ("POS Invoice", "POS Closing Entry"):
         _ensure_pos_opening_entry(doc, settings)
+
+
+def _ensure_warehouses_for_doc(doc, settings):
+    """Collect all warehouse references from header and items, push missing ones."""
+    warehouses = set()
+    for field in ("warehouse", "set_warehouse", "from_warehouse", "to_warehouse"):
+        val = doc.get(field)
+        if val:
+            warehouses.add(val)
+    for row in (doc.get("items") or []):
+        for field in ("warehouse", "s_warehouse", "t_warehouse", "from_warehouse"):
+            val = row.get(field)
+            if val:
+                warehouses.add(val)
+    for wh in warehouses:
+        _ensure_warehouse(wh, settings)
+
+
+def _ensure_warehouse(name, settings):
+    """Recursively push warehouse and its parents to center."""
+    if not name or center_exists(settings, "Warehouse", name):
+        return
+    import json
+    wh = frappe.get_doc("Warehouse", name)
+    if wh.parent_warehouse:
+        _ensure_warehouse(wh.parent_warehouse, settings)
+    data = json.loads(frappe.as_json({
+        "name": wh.name,
+        "warehouse_name": wh.warehouse_name,
+        "parent_warehouse": wh.parent_warehouse,
+        "company": wh.company,
+        "warehouse_type": wh.warehouse_type,
+        "is_group": wh.is_group,
+    }))
+    center_insert(settings, "Warehouse", data)
+
+
+def _ensure_bank_account(name, settings):
+    """Push bank account to center if missing."""
+    if not name or center_exists(settings, "Bank Account", name):
+        return
+    import json
+    ba = frappe.get_doc("Bank Account", name)
+    data = json.loads(frappe.as_json({
+        "name": ba.name,
+        "account_name": ba.account_name,
+        "bank": ba.bank,
+        "account": ba.account,
+        "company": ba.company,
+        "is_default": ba.is_default,
+        "is_company_account": ba.is_company_account,
+    }))
+    center_insert(settings, "Bank Account", data)
 
 
 def _ensure_pos_opening_entry(pos_invoice_doc, settings):

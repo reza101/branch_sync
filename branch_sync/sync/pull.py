@@ -74,13 +74,45 @@ MASTER_DOCTYPES = [
         "fields": ["name", "title", "terms"],
         "filters": [],
     },
+    {
+        "doctype": "Supplier Group",
+        "fields": ["name", "supplier_group_name", "parent_supplier_group", "is_group"],
+        "filters": [],
+    },
+    {
+        "doctype": "Territory",
+        "fields": ["name", "territory_name", "parent_territory", "is_group"],
+        "filters": [],
+    },
+    {
+        "doctype": "Department",
+        "fields": ["name", "department_name", "parent_department", "is_group", "company"],
+        "filters": [],
+    },
+    {
+        "doctype": "Designation",
+        "fields": ["name", "designation_name"],
+        "filters": [],
+    },
+    {
+        "doctype": "Leave Type",
+        "fields": ["name", "leave_type_name", "max_leaves_allowed",
+                   "allow_negative", "is_carry_forward", "is_lwp"],
+        "filters": [],
+    },
+    {
+        "doctype": "Holiday List",
+        "fields": ["name", "holiday_list_name", "from_date", "to_date", "total_holidays"],
+        "filters": [],
+    },
 ]
 
 # Tree doctypes use nested set (lft/rgt) — saving an existing record with
 # parent fields triggers "cannot be added to its own descendants". Since the
 # local DB was restored from center, these records are already correct;
 # only insert new ones, never update existing tree nodes.
-TREE_DOCTYPES = {"Item Group", "Customer Group", "Territory", "Warehouse"}
+TREE_DOCTYPES = {"Item Group", "Customer Group", "Territory", "Warehouse",
+                 "Supplier Group", "Department"}
 
 
 def sync_master_data():
