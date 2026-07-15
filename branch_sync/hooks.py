@@ -6,6 +6,7 @@ app_email = "webmajors.com@gmail.com"
 app_license = "Proprietary"
 
 after_install = "branch_sync.setup.after_install"
+after_migrate = ["branch_sync.setup.after_migrate"]
 
 scheduler_events = {
     "cron": {
