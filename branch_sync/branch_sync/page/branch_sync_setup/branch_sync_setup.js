@@ -190,15 +190,43 @@ class BranchSyncWizard {
 	renderStep4(body) {
 		body.html(`
 			<h3>${__("Step 4 of 5 — Initial Data Pull")}</h3>
-			<p class="text-muted">${__("Pulling master data from center (Items, Prices, Customers…)")}</p>
-			<div class="progress" style="height:8px;margin:16px 0;">
-				<div class="progress-bar progress-bar-striped active" id="pull_bar"
-					style="width:0%;transition:width 1s;"></div>
+			<p class="text-muted">
+				${__("Pull master data from center (Items, Prices, Customers…).")}
+				<br>
+				${__("Skip if this branch already has data from a backup.")}
+			</p>
+			<div style="display:flex;gap:12px;margin-top:24px;">
+				<button class="btn btn-primary" id="btn_pull">
+					⬇️ ${__("Pull from Center")}
+				</button>
+				<button class="btn btn-default" id="btn_skip_pull">
+					${__("Skip — Pull Later")}
+				</button>
 			</div>
-			<div id="pull_status" class="text-muted">${__("Starting…")}</div>
+			<div style="margin-top:20px;">
+				<div class="progress" style="height:8px;display:none;" id="pull_progress">
+					<div class="progress-bar progress-bar-striped active" id="pull_bar"
+						style="width:0%;transition:width 1s;"></div>
+				</div>
+				<div id="pull_status" class="text-muted" style="margin-top:8px;"></div>
+			</div>
 		`);
 
-		// Save settings first so pull can use them
+		body.find("#btn_pull").on("click", () => {
+			body.find("#btn_pull, #btn_skip_pull").prop("disabled", true);
+			body.find("#pull_progress").show();
+			body.find("#pull_status").text(__("Saving settings…"));
+			this.saveAndPull(body);
+		});
+
+		body.find("#btn_skip_pull").on("click", () => {
+			body.find("#btn_pull, #btn_skip_pull").prop("disabled", true);
+			body.find("#pull_status").text(__("Saving settings…"));
+			this.saveSettings(() => this.goTo(5));
+		});
+	}
+
+	saveSettings(callback) {
 		frappe.call({
 			method: "branch_sync.api.complete_setup",
 			args: {
@@ -209,23 +237,28 @@ class BranchSyncWizard {
 				center_api_key: this.data.center_api_key,
 				center_api_secret: this.data.center_api_secret,
 			},
-			callback: () => {
-				body.find("#pull_bar").css("width", "30%");
-				body.find("#pull_status").text(__("Settings saved. Pulling data…"));
+			callback,
+		});
+	}
 
-				frappe.call({
-					method: "branch_sync.api.run_initial_pull",
-					callback: (r) => {
-						body.find("#pull_bar").css("width", "100%");
-						if (r.message && r.message.ok) {
-							body.find("#pull_status").html(`✅ ${__("Master data pulled successfully.")}`);
-							setTimeout(() => this.goTo(5), 1000);
-						} else {
-							body.find("#pull_status").html(`❌ ${__("Pull failed. Check error logs.")}`);
-						}
-					},
-				});
-			},
+	saveAndPull(body) {
+		this.saveSettings(() => {
+			body.find("#pull_bar").css("width", "30%");
+			body.find("#pull_status").text(__("Settings saved. Pulling data…"));
+
+			frappe.call({
+				method: "branch_sync.api.run_initial_pull",
+				callback: (r) => {
+					body.find("#pull_bar").css("width", "100%");
+					if (r.message && r.message.ok) {
+						body.find("#pull_status").html(`✅ ${__("Master data pulled successfully.")}`);
+						setTimeout(() => this.goTo(5), 1000);
+					} else {
+						body.find("#pull_status").html(`❌ ${__("Pull failed. Check error logs.")}`);
+						body.find("#btn_pull, #btn_skip_pull").prop("disabled", false);
+					}
+				},
+			});
 		});
 	}
 
