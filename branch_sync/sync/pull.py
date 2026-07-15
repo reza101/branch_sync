@@ -105,6 +105,31 @@ MASTER_DOCTYPES = [
         "fields": ["name", "holiday_list_name", "from_date", "to_date", "total_holidays"],
         "filters": [],
     },
+    # Plus Care Pharmacy master data
+    {
+        "doctype": "Loyalty Level",
+        "fields": ["name", "level_name", "level_icon", "min_points", "max_points",
+                   "level_order", "is_active", "color_code", "benefits_description"],
+        "filters": [],
+    },
+    {
+        "doctype": "Loyalty Reward",
+        "fields": ["name", "reward_name", "reward_description", "reward_type", "is_active",
+                   "points_required", "minimum_loyalty_level", "minimum_purchase_amount",
+                   "discount_percentage", "discount_amount", "wallet_credit_amount",
+                   "points_bonus", "gift_item", "gift_quantity",
+                   "valid_from", "valid_until", "max_redemptions_per_customer"],
+        "filters": [["is_active", "=", 1]],
+    },
+    {
+        "doctype": "Delivery Zone",
+        "fields": ["name", "zone_name", "zone_code", "is_active", "priority",
+                   "center_latitude", "center_longitude", "radius_km",
+                   "base_delivery_fee", "per_km_charge", "free_delivery_threshold",
+                   "min_order_value", "service_start_time", "service_end_time",
+                   "service_days", "average_eta_minutes"],
+        "filters": [["is_active", "=", 1]],
+    },
 ]
 
 # Tree doctypes use nested set (lft/rgt) — saving an existing record with

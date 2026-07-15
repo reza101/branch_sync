@@ -22,6 +22,8 @@ SUBMITTABLE_DOCTYPES = {
     "Salary Slip", "Additional Salary", "Expense Claim",
     "Employee Advance", "Payroll Entry", "Gratuity",
     # Employee / Employee Checkin are NOT submittable — insert/update only
+    # Plus Care Pharmacy
+    "Delivery Order", "Medical Prescription", "POS Shift", "Treatment Plan",
 }
 
 
