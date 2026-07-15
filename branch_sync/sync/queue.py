@@ -68,6 +68,14 @@ def process_queue():
     if not settings.is_setup_complete:
         return
 
+    # Respect user-configured push interval
+    interval = int(settings.sync_interval_minutes or 5)
+    if settings.last_push_at:
+        import frappe.utils
+        elapsed = frappe.utils.time_diff_in_seconds(frappe.utils.now(), str(settings.last_push_at))
+        if elapsed < interval * 60:
+            return
+
     if not is_center_reachable(settings):
         return
 
