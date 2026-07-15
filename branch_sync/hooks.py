@@ -179,8 +179,6 @@ doc_events = {
         "on_update":    "branch_sync.sync.queue.enqueue_on_save",
         "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
     },
-}
-
     # Plus Care Pharmacy — submittable
     "Delivery Order": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
