@@ -179,53 +179,6 @@ doc_events = {
         "on_update":    "branch_sync.sync.queue.enqueue_on_save",
         "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
     },
-    # Plus Care Pharmacy — submittable
-    "Delivery Order": {
-        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
-        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
-        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
-    },
-    "Medical Prescription": {
-        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
-        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
-        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
-    },
-    "POS Shift": {
-        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
-        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
-        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
-    },
-    "Treatment Plan": {
-        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
-        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
-        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
-    },
-    # Plus Care Pharmacy — non-submittable
-    "Delivery Zone": {
-        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
-        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
-        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
-    },
-    "Courier": {
-        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
-        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
-        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
-    },
-    "Customer Mission": {
-        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
-        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
-        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
-    },
-    "Customer Reward": {
-        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
-        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
-        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
-    },
-    "POS Wallet Transaction": {
-        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
-        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
-        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
-    },
 }
 
 fixtures = [

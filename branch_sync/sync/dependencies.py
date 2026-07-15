@@ -37,10 +37,6 @@ DEPENDENCY_FIELDS = {
         "POS Profile": ["pos_profile"],
     },
     "Journal Entry": {},
-    "Delivery Order": {
-        "Delivery Zone": ["delivery_zone"],
-        "Customer": ["customer"],
-    },
 }
 
 # Fields to push for each dependency doctype
@@ -57,13 +53,6 @@ DEPENDENCY_PUSH_FIELDS = {
         "batch_id", "item", "expiry_date", "manufacturing_date",
         "supplier", "description",
         # batch_qty intentionally excluded — recalculated from SLE
-    ],
-    "Delivery Zone": [
-        "zone_name", "zone_code", "is_active", "priority",
-        "center_latitude", "center_longitude", "radius_km",
-        "base_delivery_fee", "per_km_charge", "free_delivery_threshold",
-        "min_order_value", "service_start_time", "service_end_time",
-        "service_days", "average_eta_minutes",
     ],
 }
 
@@ -268,11 +257,20 @@ def _push_dependency(dep_doctype, name, settings):
         data = json.loads(frappe.as_json(raw))
 
     try:
-        center_insert(settings, dep_doctype, data)
+        result = center_insert(settings, dep_doctype, data)
+        # Check if center used a different name (autoname override)
+        center_name = result.get("name") if result and isinstance(result, dict) else None
+        if center_name and center_name != name:
+            frappe.log_error(
+                title=f"Branch Sync: dependency name mismatch ({dep_doctype})",
+                message=f"Sent name={name!r}, center returned name={center_name!r}. "
+                        f"Link fields referencing {name!r} will fail on center.",
+            )
         # Submit on center if the original doc was submitted (e.g. POS Opening Entry)
         if was_submitted:
+            center_doc_name = center_name or name
             from branch_sync.sync.push import _submit_on_center
-            _submit_on_center(settings, dep_doctype, name)
+            _submit_on_center(settings, dep_doctype, center_doc_name)
     except Exception as e:
         frappe.log_error(
             title=f"Branch Sync: dependency push failed ({dep_doctype} {name})",
