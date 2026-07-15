@@ -141,6 +141,13 @@ doc_events = {
         "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
         "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
+    # Non-submittable master data
+    "Batch": {
+        "validate":     "branch_sync.sync.naming.validate_branch_prefix",
+        "after_insert": "branch_sync.sync.queue.enqueue_on_save",
+        "on_update":    "branch_sync.sync.queue.enqueue_on_save",
+        "on_trash":     "branch_sync.sync.lifecycle.sync_delete",
+    },
     # HRMS — non-submittable
     "Employee": {
         "after_insert": "branch_sync.sync.queue.enqueue_on_save",
