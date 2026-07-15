@@ -21,10 +21,10 @@ def configure_naming_series(prefix):
     results = {}
     for doctype in NAMING_SERIES_DOCTYPES:
         try:
-            _set_series(doctype, prefix)
-            results[doctype] = {"ok": True}
+            first_series = _set_series(doctype, prefix)
+            results[doctype] = {"ok": True, "series": first_series or ""}
         except Exception as e:
-            results[doctype] = {"ok": False, "error": str(e)}
+            results[doctype] = {"ok": False, "series": "", "error": str(e)}
     return results
 
 
@@ -43,10 +43,10 @@ def _get_current_options(doctype):
 
 
 def _set_series(doctype, prefix):
-    """Prepend prefix to every option that doesn't already have it."""
+    """Prepend prefix to every option that doesn't already have it. Returns first option."""
     options = _get_current_options(doctype)
     if not options:
-        return
+        return None
 
     new_options = []
     for opt in options:
@@ -75,6 +75,7 @@ def _set_series(doctype, prefix):
         frappe.db.set_value("Property Setter", ps_default, "value", default)
 
     frappe.clear_cache(doctype=doctype)
+    return default
 
 
 def validate_branch_prefix(doc, method):
