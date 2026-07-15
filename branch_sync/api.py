@@ -190,10 +190,7 @@ def insert_with_name(doctype, doc):
 
     if desired_name and auto_name != desired_name:
         # force=True bypasses allow_rename=0 on financial doctypes
-        frappe.rename_doc(
-            doctype, auto_name, desired_name,
-            force=True, ignore_permissions=True,
-        )
+        frappe.rename_doc(doctype, auto_name, desired_name, force=True)
 
     frappe.db.commit()
     return {"name": desired_name or auto_name}
