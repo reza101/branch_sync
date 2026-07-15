@@ -25,8 +25,8 @@ def enqueue_on_submit(doc, method):
         return
     _enqueue(
         doc.doctype, doc.name,
-        getattr(doc, "posting_date", None),
-        getattr(doc, "posting_time", None),
+        posting_date=getattr(doc, "posting_date", None),
+        posting_time=getattr(doc, "posting_time", None),
     )
 
 
