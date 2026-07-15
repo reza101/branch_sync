@@ -1,5 +1,5 @@
 import frappe
-from frappe import _
+from frappe import _, cint
 
 
 @frappe.whitelist()
@@ -35,6 +35,21 @@ def run_initial_pull():
     from branch_sync.sync.pull import sync_master_data
     sync_master_data()
     return {"ok": True}
+
+
+@frappe.whitelist()
+def get_settings():
+    """Return saved wizard settings so the UI can pre-fill on re-open."""
+    s = frappe.get_single("Branch Sync Settings")
+    return {
+        "branch_name": s.branch_name or "",
+        "branch_prefix": s.branch_prefix or "",
+        "branch_warehouse": s.branch_warehouse or "",
+        "center_url": s.center_url or "",
+        "center_api_key": s.center_api_key or "",
+        "center_api_secret": s.center_api_secret or "",
+        "is_setup_complete": cint(s.is_setup_complete),
+    }
 
 
 @frappe.whitelist()

@@ -13,7 +13,19 @@ class BranchSyncWizard {
 		this.wrapper = wrapper;
 		this.step = 1;
 		this.data = {};
-		this.render();
+		this.loadSavedSettings();
+	}
+
+	loadSavedSettings() {
+		frappe.call({
+			method: "branch_sync.api.get_settings",
+			callback: (r) => {
+				if (r.message) {
+					this.data = r.message;
+				}
+				this.render();
+			},
+		});
 	}
 
 	render() {
