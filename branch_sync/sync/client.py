@@ -28,10 +28,19 @@ def _base_url(settings):
     return settings.center_url.rstrip("/")
 
 
+def _resource_url(settings, doctype, name=None):
+    """Build a properly URL-encoded resource URL."""
+    from urllib.parse import quote
+    base = f"{_base_url(settings)}/api/resource/{quote(doctype, safe='')}"
+    if name is not None:
+        base += f"/{quote(name, safe='')}"
+    return base
+
+
 def center_get(settings, doctype, name):
     """Fetch a single document from center. Returns dict or None."""
     r = requests.get(
-        f"{_base_url(settings)}/api/resource/{doctype}/{name}",
+        _resource_url(settings, doctype, name),
         headers=settings.get_auth_headers(),
         timeout=15,
     )
@@ -48,7 +57,7 @@ def center_exists(settings, doctype, name):
 def center_insert(settings, doctype, data):
     """Insert a new document on center."""
     r = requests.post(
-        f"{_base_url(settings)}/api/resource/{doctype}",
+        _resource_url(settings, doctype),
         json=data,
         headers=settings.get_auth_headers(),
         timeout=30,

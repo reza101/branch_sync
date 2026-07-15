@@ -1,6 +1,6 @@
 import frappe
 import requests
-from branch_sync.sync.client import get_settings, _base_url, is_center_reachable
+from branch_sync.sync.client import get_settings, _resource_url
 
 
 def cancel_on_center(doctype, docname, settings=None):
@@ -8,7 +8,7 @@ def cancel_on_center(doctype, docname, settings=None):
     if not settings:
         settings = get_settings()
     r = requests.put(
-        f"{_base_url(settings)}/api/resource/{doctype}/{docname}",
+        _resource_url(settings, doctype, docname),
         json={"docstatus": 2},
         headers=settings.get_auth_headers(),
         timeout=15,
@@ -22,7 +22,7 @@ def delete_on_center(doctype, docname, settings=None):
     if not settings:
         settings = get_settings()
     r = requests.delete(
-        f"{_base_url(settings)}/api/resource/{doctype}/{docname}",
+        _resource_url(settings, doctype, docname),
         headers=settings.get_auth_headers(),
         timeout=15,
     )

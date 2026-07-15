@@ -44,9 +44,9 @@ def push_document(doctype, docname, settings=None):
                 doc = frappe.get_doc(doctype, docname)
                 payload = _build_payload(doc, settings)
                 import requests
-                from branch_sync.sync.client import _base_url
+                from branch_sync.sync.client import _resource_url
                 r = requests.put(
-                    f"{_base_url(settings)}/api/resource/{doctype}/{docname}",
+                    _resource_url(settings, doctype, docname),
                     json=payload,
                     headers=settings.get_auth_headers(),
                     timeout=30,
@@ -126,9 +126,9 @@ def _batch_no_from_bundle(bundle_name):
 
 def _submit_on_center(settings, doctype, docname):
     import requests
-    from branch_sync.sync.client import _base_url
+    from branch_sync.sync.client import _resource_url
     r = requests.put(
-        f"{_base_url(settings)}/api/resource/{doctype}/{docname}",
+        _resource_url(settings, doctype, docname),
         json={"docstatus": 1},
         headers=settings.get_auth_headers(),
         timeout=30,
