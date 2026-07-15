@@ -14,8 +14,9 @@ STRIP_FIELDS = {
 
 # Doctypes that can be pushed and their submit method
 SUBMITTABLE_DOCTYPES = {
-    "Sales Invoice", "Purchase Invoice", "Payment Entry",
-    "Stock Entry", "Stock Reconciliation",
+    "Sales Invoice", "Purchase Invoice", "Purchase Receipt",
+    "Payment Entry", "Journal Entry",
+    "Stock Entry", "Stock Reconciliation", "Delivery Note",
     "POS Invoice", "POS Opening Entry", "POS Closing Entry",
     "Attendance", "Leave Application", "Leave Allocation", "Leave Encashment",
     "Salary Slip", "Additional Salary", "Expense Claim",

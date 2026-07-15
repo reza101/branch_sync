@@ -3,8 +3,12 @@ import frappe
 NAMING_SERIES_DOCTYPES = [
     "Sales Invoice",
     "Purchase Invoice",
+    "Purchase Receipt",
     "Payment Entry",
+    "Journal Entry",
     "Stock Entry",
+    "Stock Reconciliation",
+    "Delivery Note",
     "Batch",
     "Customer",
     "Supplier",

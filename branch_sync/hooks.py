@@ -66,6 +66,30 @@ doc_events = {
         "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
         "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
     },
+    "Purchase Receipt": {
+        "validate":  "branch_sync.sync.naming.validate_branch_prefix",
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
+    },
+    "Stock Reconciliation": {
+        "validate":  "branch_sync.sync.naming.validate_branch_prefix",
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
+    },
+    "Journal Entry": {
+        "validate":  "branch_sync.sync.naming.validate_branch_prefix",
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
+    },
+    "Delivery Note": {
+        "validate":  "branch_sync.sync.naming.validate_branch_prefix",
+        "on_submit": "branch_sync.sync.queue.enqueue_on_submit",
+        "on_cancel": "branch_sync.sync.lifecycle.sync_cancel",
+        "on_trash":  "branch_sync.sync.lifecycle.sync_delete",
+    },
     # HRMS — submittable
     "Attendance": {
         "on_submit": "branch_sync.sync.queue.enqueue_on_submit",

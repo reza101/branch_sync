@@ -7,7 +7,15 @@ DEPENDENCY_FIELDS = {
         "Supplier": ["supplier"],
         "Batch": ["items.batch_no"],
     },
+    "Purchase Receipt": {
+        "Supplier": ["supplier"],
+        "Batch": ["items.batch_no"],
+    },
     "Sales Invoice": {
+        "Customer": ["customer"],
+        "Batch": ["items.batch_no"],
+    },
+    "Delivery Note": {
         "Customer": ["customer"],
         "Batch": ["items.batch_no"],
     },
@@ -28,6 +36,7 @@ DEPENDENCY_FIELDS = {
     "POS Opening Entry": {
         "POS Profile": ["pos_profile"],
     },
+    "Journal Entry": {},
 }
 
 # Fields to push for each dependency doctype
