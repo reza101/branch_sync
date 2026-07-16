@@ -169,6 +169,26 @@ def retry_failed():
 
 
 @frappe.whitelist()
+def resync_one(queue_name):
+    """Manually resync a single Branch Sync Queue record right now,
+    regardless of its current status or the scheduled push interval."""
+    from branch_sync.sync.client import get_settings, is_center_reachable
+
+    item = frappe.get_doc("Branch Sync Queue", queue_name)
+    settings = get_settings()
+
+    if not settings.is_setup_complete:
+        frappe.throw(_("Branch Sync setup is not complete"))
+    if not is_center_reachable(settings):
+        frappe.throw(_("Center site is not reachable"))
+
+    from branch_sync.sync.queue import _process_queue_item
+    _process_queue_item(item, settings)
+
+    return {"status": frappe.db.get_value("Branch Sync Queue", queue_name, "status")}
+
+
+@frappe.whitelist()
 def insert_with_name(doctype, doc):
     """
     Insert a document forcing the name supplied by the branch, bypassing

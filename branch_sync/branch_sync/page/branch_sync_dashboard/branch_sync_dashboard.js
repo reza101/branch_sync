@@ -32,6 +32,14 @@ frappe.pages["branch-sync-dashboard"].on_page_load = function (wrapper) {
 		frappe.set_route("branch-sync-setup");
 	});
 
+	page.add_action_item(__("View Log"), () => {
+		frappe.set_route("List", "Branch Sync Log");
+	});
+
+	page.add_action_item(__("View Queue"), () => {
+		frappe.set_route("List", "Branch Sync Queue");
+	});
+
 	const dashboard = new BranchSyncDashboard(wrapper);
 	dashboard.load();
 
