@@ -32,6 +32,9 @@ def enqueue_on_submit(doc, method):
 
 def enqueue_on_save(doc, method):
     """Hook for non-submittable doctypes (e.g. Employee) — enqueue on insert/update."""
+    if frappe.flags.get("branch_sync_pulling"):
+        # Record was just written by the nightly pull from center — don't push it back
+        return
     settings = get_settings()
     if not settings.is_setup_complete:
         return

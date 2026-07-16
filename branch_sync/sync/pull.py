@@ -139,8 +139,12 @@ def sync_master_data():
     if not is_center_reachable(settings):
         return
 
-    for config in MASTER_DOCTYPES:
-        _pull_doctype(config, settings)
+    frappe.flags.branch_sync_pulling = True
+    try:
+        for config in MASTER_DOCTYPES:
+            _pull_doctype(config, settings)
+    finally:
+        frappe.flags.branch_sync_pulling = False
 
     frappe.db.set_value("Branch Sync Settings", None, "last_pull_at", frappe.utils.now())
     frappe.db.commit()
