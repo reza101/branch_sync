@@ -113,6 +113,17 @@ def _build_payload(doc, settings):
         from branch_sync.sync.dependencies import default_buying_price_list
         data["default_price_list"] = default_buying_price_list()
 
+    # Batch is queued independently (after_insert) as soon as it's created — often
+    # before the Purchase Invoice/Receipt that created it has its own queue entry
+    # processed (queue order is posting_date/time based, not creation order; see
+    # queue.process_queue). reference_name may point to a document that doesn't
+    # exist on center yet, causing a LinkValidationError. It's provenance-only
+    # (expiry/manufacturing date are already sent explicitly), so drop it here —
+    # same as the dependency-push path in dependencies.DEPENDENCY_PUSH_FIELDS.
+    if doc.doctype == "Batch":
+        data.pop("reference_doctype", None)
+        data.pop("reference_name", None)
+
     return data
 
 
