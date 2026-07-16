@@ -108,6 +108,11 @@ def _build_payload(doc, settings):
             cleaned.append({ck: cv for ck, cv in row.items() if ck not in CHILD_STRIP_FIELDS})
         data[key] = cleaned
 
+    # Center requires Supplier.default_price_list — fall back if branch record lacks one
+    if doc.doctype == "Supplier" and not data.get("default_price_list"):
+        from branch_sync.sync.dependencies import default_buying_price_list
+        data["default_price_list"] = default_buying_price_list()
+
     return data
 
 

@@ -43,7 +43,7 @@ DEPENDENCY_FIELDS = {
 DEPENDENCY_PUSH_FIELDS = {
     "Supplier": [
         "supplier_name", "supplier_group", "supplier_type",
-        "country", "mobile_no", "email_id", "tax_id",
+        "country", "mobile_no", "email_id", "tax_id", "default_price_list",
     ],
     "Customer": [
         "customer_name", "customer_group", "customer_type",
@@ -55,6 +55,21 @@ DEPENDENCY_PUSH_FIELDS = {
         # batch_qty intentionally excluded — recalculated from SLE
     ],
 }
+
+
+def default_buying_price_list():
+    """Fallback Price List for Supplier.default_price_list (mandatory on center).
+
+    Reuses the same price list plus_care_pharmacy already defaults Purchase
+    Invoice.buying_price_list to (a Property Setter fixture, so multiple
+    buying price lists — e.g. SAR vs YER — don't leave this ambiguous).
+    """
+    value = frappe.db.get_value(
+        "Property Setter",
+        {"doc_type": "Purchase Invoice", "field_name": "buying_price_list", "property": "default"},
+        "value",
+    )
+    return value or frappe.db.get_value("Price List", {"buying": 1, "enabled": 1}, "name")
 
 
 def ensure_dependencies(doctype, docname, settings):
@@ -254,6 +269,10 @@ def _push_dependency(dep_doctype, name, settings):
         raw = {"name": name}
         for f in fields:
             raw[f] = dep_doc.get(f)
+        # Center requires Supplier.default_price_list — fall back to the
+        # default buying price list if the branch record doesn't have one
+        if dep_doctype == "Supplier" and not raw.get("default_price_list"):
+            raw["default_price_list"] = default_buying_price_list()
         data = json.loads(frappe.as_json(raw))
 
     try:

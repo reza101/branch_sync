@@ -40,7 +40,8 @@ MASTER_DOCTYPES = [
     {
         "doctype": "Supplier",
         "fields": ["name", "supplier_name", "supplier_group", "supplier_type",
-                   "country", "mobile_no", "email_id", "default_currency"],
+                   "country", "mobile_no", "email_id", "default_currency",
+                   "default_price_list"],
         "filters": [],
     },
     {
