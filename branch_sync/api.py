@@ -106,7 +106,6 @@ def get_dashboard_data():
 def get_version_info():
     """Compare local vs center app versions. Called from Settings and Dashboard."""
     import requests as req
-    import frappe.utils
 
     settings = frappe.get_single("Branch Sync Settings")
     if not settings.is_setup_complete:

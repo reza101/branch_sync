@@ -74,7 +74,6 @@ def process_queue():
     # Respect user-configured push interval
     interval = int(settings.sync_interval_minutes or 5)
     if settings.last_push_at:
-        import frappe.utils
         elapsed = frappe.utils.time_diff_in_seconds(frappe.utils.now(), str(settings.last_push_at))
         if elapsed < interval * 60:
             return
